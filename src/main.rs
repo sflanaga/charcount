@@ -17,12 +17,17 @@ fn main() {
 
 fn run() -> Result<()> {
     // println!("Hello, world!");
-    let to_find = b';';
+    let args:Vec<String> = std::env::args().collect();
+    if args.len() < 3 {
+        eprintln!("usage: charcounts <character> file1 [file2 .. fileN]");
+        std::process::exit(1);
+    }
+    let to_find = args.get(1).unwrap().as_bytes()[0];
     let mut buf = [0; 64*4096];
     let mut hm: HashMap<u64, u64> = HashMap::new();
     let mut line_count = 0;
     let mut curr_char = 0;
-    for f in std::env::args().skip(1) {
+    for f in args.iter().skip(2) {
         let path = PathBuf::from(f);
         // println!("reading file {}", &path.display());
         let mut rdr = BufReader::new(crate::decomp::open_comp_file(&path)?);
