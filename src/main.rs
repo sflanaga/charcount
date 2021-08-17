@@ -31,7 +31,7 @@ fn run() -> Result<()> {
         let mut last_bytes = 0usize;
         let mut last_dur = start_f.elapsed();
         loop {
-            std::thread::sleep(Duration::from_millis(10));
+            std::thread::sleep(Duration::from_millis(250));
 
             let total_bytes = t_bytes.load(std::sync::atomic::Ordering::Relaxed);
 
