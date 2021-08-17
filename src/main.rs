@@ -46,7 +46,7 @@ fn run() -> Result<()> {
             let sec: f64 =
                 (d_dur.as_secs() as f64) + (d_dur.subsec_nanos() as f64 / 1_000_000_000.0);
             let rate = (d_bytes as f64 / sec) as usize;
-            eprintln!(
+            eprint!(
                 "bytes: rate {}/s  total {}                          \r",
                 mem_metric_digit(rate, 4),
                 mem_metric_digit(total_bytes, 4)
@@ -81,7 +81,6 @@ fn run() -> Result<()> {
                     curr_char = 0;
                 }
             });
-            std::thread::sleep(Duration::from_millis(1));
             bytes.fetch_add(len, Ordering::Relaxed);
         }
     }
