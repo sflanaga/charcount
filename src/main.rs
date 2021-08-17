@@ -18,6 +18,7 @@ fn run() -> Result<()> {
         eprintln!("usage: charcounts <character> file1 [file2 .. fileN]");
         std::process::exit(1);
     }
+    let start_f = Instant::now();
     let to_find = args.get(1).unwrap().as_bytes()[0];
     let mut buf = [0; 64 * 4096];
     let mut hm: HashMap<u64, u64> = HashMap::new();
@@ -43,8 +44,7 @@ fn run() -> Result<()> {
             let d_bytes = total_bytes - last_bytes;
             let d_dur = elapsed - last_dur;
 
-            let sec: f64 =
-                (d_dur.as_secs() as f64) + (d_dur.subsec_nanos() as f64 / 1_000_000_000.0);
+            let sec: f64 = (d_dur.as_nanos() as f64) / 1_000_000_000.0;
             let rate = (d_bytes as f64 / sec) as usize;
             eprint!(
                 "bytes: rate {}/s  total {}                          \r",
@@ -84,7 +84,10 @@ fn run() -> Result<()> {
             bytes.fetch_add(len, Ordering::Relaxed);
         }
     }
-
+    let b = bytes.load(Ordering::Relaxed);
+    bytes.store(0, Ordering::Relaxed);
+    let rate = b as f64 / start_f.elapsed().as_secs_f64();
+    println!("\n\nfinal: rate: {}/s  total: {}", mem_metric_digit(rate as usize, 4), mem_metric_digit(b, 4));
     let mut cc_vec: Vec<(u64, u64)> = hm.iter().map(|(k, v)| (*k, *v)).collect();
     cc_vec.sort_by(|a, b| b.1.partial_cmp(&a.1).unwrap());
     for (k, v) in cc_vec {
